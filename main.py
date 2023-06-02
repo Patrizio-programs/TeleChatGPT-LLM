@@ -3,7 +3,7 @@ import telebot
 from telebot import types
 from flask import Flask, request, render_template
 import requests
-
+import json
 # LLM imports
 from gpt_llm import llm as chatbot
 from modes import modes
@@ -128,17 +128,21 @@ def image_info(message):
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        update = telebot.types.Update.de_json(
-            request.stream.read().decode('utf-8'))
-
-        parse_message(update)
+        json_data = request.get_json()
+        update = telebot.types.Update.de_json(json_data)
+        try:
+            bot.process_new_updates([update])
+        except Exception as e:
+            # Log the exception
+            print(f"Error processing update: {e}")
         return 'ok', 200
     else:
         return ("GPT live")
 
 
 def parse_message(update):
-    bot.process_new_updates([update])
+    message = update.message
+    start_command(message)
 
 
 # define callback function for mode buttons
