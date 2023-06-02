@@ -131,17 +131,16 @@ def index():
     if request.method == "POST":
         json_data = request.get_json()
         update = telebot.types.Update.de_json(json_data)
-        message = update.messaage
-        print(update)
-        parse_message(message)
+        parse_message(update)
         return 'ok', 200
     else:
         return ("GPT live")
 
 
-def parse_message(message):
+def parse_message(update):
+    message = update.messaage
     if message.text.startswith('/'):
-        bot.process_commands(message)  # Handle command
+        bot.process_new_updates([update])  # Handle command
     else:
         # Handle regular message
         generate_message(message)
