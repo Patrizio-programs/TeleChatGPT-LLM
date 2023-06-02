@@ -140,9 +140,23 @@ def index():
         return ("GPT live")
 
 
-def parse_message(update):
-    message = update.message
-    start_command(message)
+def parse_message(message):
+    if message.text.startswith('/'):
+        # Handle command
+        if message.text == '/start':
+            start_command(message)
+        elif message.text == '/info':
+            info_command(message)
+        elif message.text == '/bots':
+            bots_command(message)
+        elif message.text.startswith('/img'):
+            image_info(message)
+        else:
+            chat_id = message.chat.id
+            bot.send_message(chat_id, 'Unknown command.')
+    else:
+        # Handle regular message
+        generate_message(message)
 
 
 # define callback function for mode buttons
