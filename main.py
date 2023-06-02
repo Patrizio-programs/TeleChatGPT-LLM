@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 import os
 import telebot
 from telebot import types
@@ -131,6 +132,7 @@ def index():
         json_data = request.get_json()
         update = telebot.types.Update.de_json(json_data)
         message = update.messaage
+        print(update)
         parse_message(message)
         return 'ok', 200
     else:
@@ -139,20 +141,7 @@ def index():
 
 def parse_message(message):
     if message.text.startswith('/'):
-        # Handle command
-        if message.text == '/start':
-            start_command(message)
-        elif message.text == '/info':
-            info_command(message)
-        elif message.text == '/bots':
-            bots_command(message)
-        elif message.text.startswith('/img'):
-            image_info(message)
-        elif message.text.startswith('/modes'):
-            modes_handler(message)
-        else:
-            chat_id = message.chat.id
-            bot.send_message(chat_id, 'Unknown command.')
+        bot.process_commands(message)  # Handle command
     else:
         # Handle regular message
         generate_message(message)
@@ -174,6 +163,6 @@ def modes_handler(message):
                      reply_markup=keyboard)
 
 
-# app.run(debug=True, host="0.0.0.0", port=8080)
+app.run(debug=True, host="0.0.0.0", port=8080)
 
 # bot.polling()

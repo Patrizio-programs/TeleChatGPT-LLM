@@ -1,40 +1,36 @@
+from dotenv import load_dotenv
 import os
 import telebot
 from telebot import types
 from flask import Flask, request, render_template
 import requests
-from revChatGPT.V1 import Chatbot
-
+import json
 # LLM imports
-from gpt_llm import ChatGPT, chat_token
+from gpt_llm import llm as chatbot
 from modes import modes
 from langchain.prompts import (
     SystemMessagePromptTemplate,
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
 )
+load_dotenv()
 mode_names = list(modes.keys())
 current_mode = modes["TeleChatGPT"]
 
 keyboard = telebot.types.InlineKeyboardMarkup(row_width=1)
 for mode_name in mode_names:
-    button = telebot.types.InlineKeyboardButton(
-        text=mode_name, callback_data=mode_name)
+    button = telebot.types.InlineKeyboardButton(text=mode_name,
+                                                callback_data=mode_name)
     keyboard.add(button)
-
-
-chatbot = ChatGPT(token=chat_token)
-
 
 app = Flask(__name__, template_folder="templates")
 img_url = "https://openai80.p.rapidapi.com/images/generations"
-bot_key = "os.environ['BOT_KEY']"
-token = os.environ['CHAT_TOKEN']
-img_token = os.environ['IMG_TOKEN']
+bot_key = os.getenv('BOT_KEY')
+img_token = os.getenv('IMG_TOKEN')
 bot = telebot.TeleBot(bot_key)
-webhook = os.environ['WEBHOOK']
+webhook = img_token = os.getenv('WEBHOOK')
+bot.delete_webhook()
 bot.set_webhook(url=webhook)
-
 # generate LLM response with system message
 
 
@@ -42,7 +38,6 @@ bot.set_webhook(url=webhook)
 def generate_message(message):
     chat_id = message.chat.id
     prompt = message.text
-    print(current_mode)
     reply = bot.send_message(chat_id, "Thinking...")
 
     # SORT OUT LLM CONFIG- NEED TO FIND A WAY TO SEPERATE THIS FUNCTION FOR BETTER READABILITY
@@ -67,9 +62,8 @@ def start_command(message):
     chat_id = message.chat.id
     bot.send_message(chat_id, 'Enter a prompt, wait for a response.')
 
+
 # Define the info command
-
-
 @bot.message_handler(commands=['info'])
 def info_command(message):
     chat_id = message.chat.id
@@ -107,8 +101,7 @@ def image_info(message):
     prompt = message.text[5:]
     bot.send_message(
         message.chat.id,
-        "It can take a while to generate your image so please be patient"
-    )
+        "It can take a while to generate your image so please be patient")
     payload = {"prompt": prompt, "n": 2, "size": "1024x1024"}
     headers = {
         "Content-Type": "application/json",
@@ -122,16 +115,11 @@ def image_info(message):
         response_dict = response.json()
         images_list = response_dict["data"]
     except requests.exceptions.HTTPError as ex:
-        bot.send_message(
-            message.chat.id,
-            f"Error: {ex}. Try image generation another time"
-        )
+        bot.send_message(message.chat.id,
+                         f"Error: {ex}. Try image generation another time")
         return
     except Exception as ex:
-        bot.send_message(
-            message.chat.id,
-            f"Error: {ex}"
-        )
+        bot.send_message(message.chat.id, f"Error: {ex}")
         return
     for image_dict in images_list:
         photo_url = image_dict["url"]
@@ -141,32 +129,40 @@ def image_info(message):
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        update = telebot.types.Update.de_json(
-            request.stream.read().decode('utf-8'))
+        json_data = request.get_json()
+        update = telebot.types.Update.de_json(json_data)
         message = update.message
+        print(message)
         parse_message(message)
         return 'ok', 200
     else:
-        return render_template("index.html")
+        return ("GPT live")
 
 
 def parse_message(message):
-    if message.text.startswith('/'):
-        # Handle command
-        if message.text == '/start':
-            start_command(message)
-        elif message.text == '/info':
-            info_command(message)
-        elif message.text == '/bots':
-            bots_command(message)
-        elif message.text.startswith('/img'):
-            image_info(message)
+    if message.text:
+        if message.text.startswith('/'):
+            # Handle command
+            if message.text == '/start':
+                start_command(message)
+            elif message.text == '/info':
+                info_command(message)
+            elif message.text == '/bots':
+                bots_command(message)
+            elif message.text.startswith('/img'):
+                image_info(message)
+            elif message.text.startswith('/mode'):
+                start_mode(message)
+            else:
+                chat_id = message.chat.id
+                bot.send_message(chat_id, 'Unknown command.')
         else:
-            chat_id = message.chat.id
-            bot.send_message(chat_id, 'Unknown command.')
-    else:
-        # Handle regular message
-        generate_message(message)
+            # Handle regular message
+            generate_message(message)
+    elif message.callback_query:
+        # Handle callback query
+        callback_query = message.callback_query
+        callback_handler(callback_query)
 
 
 # define callback function for mode buttons
@@ -175,12 +171,20 @@ def callback_handler(call):
     global current_mode
     current_mode = modes[call.data]
     bot.answer_callback_query(call.id, text="You have selected " + call.data)
-    print(current_mode)
+
 
 # define command handler to display mode buttons
-
-
-@bot.message_handler(commands=['modes'])
+@bot.message_handler(commands=['mode'])
 def modes_handler(message):
-    bot.send_message(
-        message.chat.id, text="Please select a mode:", reply_markup=keyboard)
+    bot.send_message(message.chat.id,
+                     text="Please select a mode:",
+                     reply_markup=keyboard)
+
+
+def start_mode(message):
+    modes_handler(message)
+
+
+app.run(debug=True, host="0.0.0.0", port=80)
+
+# bot.polling()
