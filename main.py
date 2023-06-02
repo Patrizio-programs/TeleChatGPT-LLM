@@ -139,7 +139,7 @@ def index():
 
 def parse_message(update):
     message = update.message
-    bot.process_new_messages(message)
+    bot.start_command(message)
     
 
 
