@@ -138,7 +138,9 @@ def index():
 
 
 def parse_message(update):
-    bot.process_new_updates([update])
+    message = update.message
+    bot.process_new_messages(message)
+    
 
 
 # define callback function for mode buttons
