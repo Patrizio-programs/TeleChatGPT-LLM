@@ -6,7 +6,7 @@ import requests
 from revChatGPT.V1 import Chatbot
 
 # LLM imports
-from gpt_llm import ChatGPT, chat_token
+from gpt_llm import ChatGPT
 from modes import modes
 from langchain.prompts import (
     SystemMessagePromptTemplate,
@@ -22,10 +22,6 @@ for mode_name in mode_names:
         text=mode_name, callback_data=mode_name)
     keyboard.add(button)
 
-
-chatbot = ChatGPT(token=chat_token)
-
-
 app = Flask(__name__, template_folder="templates")
 img_url = "https://openai80.p.rapidapi.com/images/generations"
 bot_key = "os.environ['BOT_KEY']"
@@ -34,6 +30,7 @@ img_token = os.environ['IMG_TOKEN']
 bot = telebot.TeleBot(bot_key)
 webhook = os.environ['WEBHOOK']
 bot.set_webhook(url=webhook)
+chatbot = ChatGPT(token=token)
 
 # generate LLM response with system message
 
