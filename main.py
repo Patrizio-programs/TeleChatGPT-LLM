@@ -137,6 +137,7 @@ def index():
 
 
 def parse_message(update):
+    print(update)
     message = update.messaage
     if message.text.startswith('/'):
         bot.process_new_updates([update])  # Handle command
