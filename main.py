@@ -26,7 +26,6 @@ for mode_name in mode_names:
 app = Flask(__name__, template_folder="templates")
 img_url = "https://openai80.p.rapidapi.com/images/generations"
 bot_key = os.environ['BOT_KEY']
-token = os.environ['CHAT_TOKEN']
 img_token = os.environ['IMG_TOKEN']
 bot = telebot.TeleBot(bot_key)
 webhook = os.environ['WEBHOOK']
