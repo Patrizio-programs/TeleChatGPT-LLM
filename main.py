@@ -130,19 +130,11 @@ def index():
     if request.method == "POST":
         update = telebot.types.Update.de_json(
             request.stream.read().decode('utf-8'))
-        parse_message(update)
+        bot.process_new_updates([update])  # Handle command
+
         return 'ok', 200
     else:
         return ("GPT live")
-
-
-def parse_message(update):
-    message = update.message
-    if message.text.startswith('/'):
-        bot.process_new_updates([update])  # Handle command
-    else:
-        # Handle regular message
-        generate_message(message)
 
 
 # define callback function for mode buttons
