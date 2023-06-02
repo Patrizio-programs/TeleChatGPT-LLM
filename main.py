@@ -128,8 +128,8 @@ def image_info(message):
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        json_string = json.dumps(json.loads(request.body)).read(length).decode("utf-8")
-        update = telebot.types.Update.de_json(json_string)
+        json_data = request.get_json()
+        update = telebot.types.Update.de_json(json_data)
 
         parse_message(update)
         return 'ok', 200
