@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 import os
 import telebot
 from telebot import types
