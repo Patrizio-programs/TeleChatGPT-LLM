@@ -162,7 +162,4 @@ def modes_handler(message):
                      text="Please select a mode:",
                      reply_markup=keyboard)
 
-
-app.run(debug=True, host="0.0.0.0", port=8080)
-
 # bot.polling()
