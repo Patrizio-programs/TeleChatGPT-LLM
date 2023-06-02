@@ -29,7 +29,6 @@ token = os.environ['CHAT_TOKEN']
 img_token = os.environ['IMG_TOKEN']
 bot = telebot.TeleBot(bot_key)
 webhook = os.environ['WEBHOOK']
-bot.set_webhook(url=webhook)
 chatbot = ChatGPT(token=token)
 
 # generate LLM response with system message
@@ -144,7 +143,9 @@ def index():
         parse_message(message)
         return 'ok', 200
     else:
-        return ("index.html")
+        return ("GPT live")
+    
+bot.set_webhook(url=webhook)
 
 
 def parse_message(message):
