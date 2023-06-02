@@ -130,11 +130,8 @@ def index():
     if request.method == "POST":
         json_data = request.get_json()
         update = telebot.types.Update.de_json(json_data)
-        try:
-            bot.process_new_updates([update])
-        except Exception as e:
-            # Log the exception
-            print(f"Error processing update: {e}")
+        message = update.messaage
+        parse_message(message)
         return 'ok', 200
     else:
         return ("GPT live")
@@ -151,6 +148,8 @@ def parse_message(message):
             bots_command(message)
         elif message.text.startswith('/img'):
             image_info(message)
+        elif message.text.startswith('/modes'):
+            modes_handler(message)
         else:
             chat_id = message.chat.id
             bot.send_message(chat_id, 'Unknown command.')
