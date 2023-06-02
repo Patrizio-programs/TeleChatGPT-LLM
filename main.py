@@ -147,7 +147,7 @@ def index():
         parse_message(message)
         return 'ok', 200
     else:
-        return render_template("index.html")
+        return ("index.html")
 
 
 def parse_message(message):
