@@ -119,7 +119,7 @@ def index():
 
         return 'ok', 200
     else:
-        return render_template("index.html")
+        return ("working")
 
 
 # define callback function for mode buttons
