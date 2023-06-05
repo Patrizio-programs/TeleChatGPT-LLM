@@ -6,7 +6,7 @@ import requests
 import json
 
 from modes import modes
-import deep
+import ai
 
 mode_names = list(modes.keys())
 current_mode = modes["TeleChatGPT"]
@@ -33,7 +33,7 @@ def generate_message(message):
     chat_id = message.chat.id
     prompt = message.text
     reply = bot.send_message(chat_id, "Thinking...")
-    req = deep.Completion.create(prompt=prompt, systemMessage=current_mode)
+    req = ai.Completion.create(prompt=prompt, systemMessage=current_mode)
     response = req["text"]
     bot.edit_message_text(chat_id=chat_id,
                           message_id=reply.message_id,
