@@ -7,11 +7,7 @@ import json
 # LLM imports
 from gpt_llm import llm as chatbot
 from modes import modes
-from langchain.prompts import (
-    SystemMessagePromptTemplate,
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-)
+import deep
 
 mode_names = list(modes.keys())
 current_mode = modes["TeleChatGPT"]
@@ -38,18 +34,8 @@ def generate_message(message):
     chat_id = message.chat.id
     prompt = message.text
     reply = bot.send_message(chat_id, "Thinking...")
-
-    # SORT OUT LLM CONFIG- NEED TO FIND A WAY TO SEPERATE THIS FUNCTION FOR BETTER READABILITY
-    system_message = current_mode
-    system_message_prompt = SystemMessagePromptTemplate.from_template(
-        system_message)
-    human_message = prompt
-    human_message_prompt = HumanMessagePromptTemplate.from_template(
-        human_message)
-    chat_prompt = ChatPromptTemplate.from_messages(
-        [system_message_prompt, human_message_prompt])
-    messages = chat_prompt.format_prompt().to_messages()
-    response = chatbot(str(chat_prompt.format_prompt()))
+    req = deep.Completion.create(prompt=prompt, systemMessage=current_mode)
+    response = req["text"]
     bot.edit_message_text(chat_id=chat_id,
                           message_id=reply.message_id,
                           text=response)
@@ -134,7 +120,7 @@ def index():
 
         return 'ok', 200
     else:
-        return ("GPT live")
+        return render_template("index.html")
 
 
 # define callback function for mode buttons
