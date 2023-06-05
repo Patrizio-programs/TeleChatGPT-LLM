@@ -4,4 +4,3 @@ telebot
 flask
 requests
 pydantic
-urllib
