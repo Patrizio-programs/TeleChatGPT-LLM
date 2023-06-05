@@ -4,8 +4,7 @@ from telebot import types
 from flask import Flask, request, render_template
 import requests
 import json
-# LLM imports
-from gpt_llm import llm as chatbot
+
 from modes import modes
 import deep
 
@@ -139,5 +138,5 @@ def modes_handler(message):
                      reply_markup=keyboard)
 
 
-app.run(debug=True, host="0.0.0.0", port=8080)
+# app.run(debug=True, host="0.0.0.0", port=8080)
 # bot.polling()

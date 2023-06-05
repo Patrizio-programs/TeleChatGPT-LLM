@@ -4,4 +4,4 @@ telebot
 flask
 requests
 pydantic
-hugchat
+urllib
